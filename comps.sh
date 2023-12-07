@@ -1,10 +1,13 @@
 #!/bin/bash
 
-os="undefined"
-file="undefined"
-output="undefined"
-compiler_args="undefined"
-processed_args=$@
+os=""
+file=""
+output=""
+compiler_args=""
+processed_args=( "$@" )
+mode=""
+usage="Usage: comps {command} {file.cpp/c} {arguments}"
+run=false
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     os="macos"
@@ -14,50 +17,69 @@ elif [[ "$OSTYPE" == "win32"* ]]; then
     os="windows"
 fi
 
-echo "$@"
-
 compile() {
-    echo "$os"
     if [[ $os == "macos" ]]; then
-        output=$(clang $file $args)
-        echo $output
+        output=$(clang "$file" "$compiler_args")
+        echo "$output"
     
     elif [[ $os == "linux" ]]; then
-        gcc || echo "Error"
+        {
+            output_name="$(basename "${file%.*}")"
+            command=(-o "$output_name" "$file" $compiler_args)
+            g++ "${command[@]}"
+
+            if [[ $run == true ]]; then
+                ./$output_name
+            fi
+        } || {
+            echo "Error"
+        }
     fi
 }
 
 #first argument
 case "$1" in
     "c"|"compile")
-    echo "compiling"
-    ;;
+        mode="c"
+        ;;
+    "cr")
+        mode="c"
+        run=true
+        ;;
 
     *)
-    echo "Usage: comps {command} {file.cpp/c} {arguments}"
+    echo "$usage"
+    exit 1
     ;;
 esac
 
 #file
 case "$2" in
     *".c"|*".cpp")
-        echo "Compiling $2"
-        file="$2"
-        # compile
+        if [[ "$mode" == "c" ]]; then
+            echo "Compiling $2 (linux)"
+            file="$2"
+            compile
+
+        else
+            echo "$usage"
+        fi
     ;;
 
     *)
         echo "Can only compile .cpp/.c files."
+        exit 1
     ;;
 esac
 
-echo $processed_args
+# echo  "${processed_args[@]}"
 
-for arg in $processed_args; do
+for arg in "${processed_args[@]}"; do
     if [[ $arg == "--"* ]]; then
-        echo "$arg has a --"
+        compiler_args="$compiler_args $arg"
     else
-        echo "$arg has no --"
+
+        echo ""
     fi
 done
 
