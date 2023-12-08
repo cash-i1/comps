@@ -1,4 +1,5 @@
 /target
 a.out
 main.cpp
-main copy.cpp
+main\ copy.cpp
+main
