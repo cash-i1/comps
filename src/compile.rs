@@ -1,6 +1,6 @@
 use std::process::Command;
-use std
+// use std
 
 pub fn compile() {
-    
+    println!("test");
 }
