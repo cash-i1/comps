@@ -1,5 +1,5 @@
 [package]
-name = "clap_test"
+name = "comps"
 version = "0.1.0"
 edition = "2021"
 

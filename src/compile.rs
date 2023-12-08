@@ -16,12 +16,11 @@ pub fn compile(settings: ArgumentsStruct) {
         if settings.file_extension == "cpp"{
             
             if settings.build == true {
-                let mut gpp = Command::new("g++")
+                let gpp = Command::new("g++")
                     .arg(settings.source_path)
                     .spawn()
                     .expect("Failed to execute gcc");
                     
-                
                 let status = gpp.wait_with_output().unwrap();
 
                 if !status.status.success() {
